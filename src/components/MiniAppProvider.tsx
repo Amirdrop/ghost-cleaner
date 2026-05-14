@@ -1,27 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function MiniAppProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [isReady, setIsReady] = useState(false);
-
   useEffect(() => {
     const initMiniApp = async () => {
       try {
-        // Dynamically import the SDK to avoid SSR issues
-        const { sdk } = await import("@farcaster/miniapp-sdk");
-
-        // Call ready() to hide the splash screen
-        await sdk.actions.ready();
-        setIsReady(true);
+        const mod = await import("@farcaster/miniapp-sdk");
+        const sdk = (mod as any).default;
+        if (sdk && typeof sdk.ready === "function") {
+          await sdk.ready();
+          console.log("Mini App ready!");
+        }
       } catch (err) {
-        // Not running inside a Farcaster client, that's fine
-        console.log("Not in Farcaster Mini App context");
-        setIsReady(true);
+        console.log("Not in Farcaster Mini App context:", err);
       }
     };
 
