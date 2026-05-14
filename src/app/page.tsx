@@ -63,10 +63,10 @@ export default function Home() {
             className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-2xl font-bold text-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-xl shadow-purple-200 hover:shadow-2xl hover:scale-105"
           >
             <span>🚀</span>
-            Start Scanning
+            Mulai Scan
           </Link>
-          <p className="text-sm text-gray-400 mt-4">
-            Connect your Farcaster account to get started
+          <p className="text-sm text-gray-500 mt-4">
+            Masukkan username atau FID Farcaster untuk mulai
           </p>
         </div>
 
