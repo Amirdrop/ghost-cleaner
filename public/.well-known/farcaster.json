@@ -1,0 +1,18 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjAsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCJ9",
+    "payload": "eyJkb21haW4iOiJnaG9zdC1jbGVhbmVyLnZlcmNlbC5hcHAifQ",
+    "signature": "MHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAw"
+  },
+  "frame": {
+    "version": "1",
+    "name": "Ghost Cleaner",
+    "homeUrl": "https://ghost-cleaner.vercel.app",
+    "iconUrl": "https://ghost-cleaner.vercel.app/icon.png",
+    "imageUrl": "https://ghost-cleaner.vercel.app/og.png",
+    "buttonTitle": "🧹 Clean Following",
+    "splashImageUrl": "https://ghost-cleaner.vercel.app/splash.png",
+    "splashBackgroundColor": "#7c3aed",
+    "webhookUrl": "https://ghost-cleaner.vercel.app/api/webhook"
+  }
+}
