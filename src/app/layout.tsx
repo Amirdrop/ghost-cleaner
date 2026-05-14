@@ -9,15 +9,15 @@ export const metadata: Metadata = {
     "Detect and unfollow inactive Farcaster accounts. Keep your following list clean.",
   keywords: ["farcaster", "ghost", "unfollow", "cleaner", "web3"],
   icons: {
-    icon: "/ghost-icon.jpg",
-    shortcut: "/ghost-icon.jpg",
-    apple: "/ghost-icon.jpg",
+    icon: "/ghost-icon.svg",
+    shortcut: "/ghost-icon.svg",
+    apple: "/ghost-icon.svg",
   },
   openGraph: {
     title: "Ghost Cleaner",
     description: "Find and unfollow inactive Farcaster accounts",
     type: "website",
-    images: ["/ghost-icon.jpg"],
+    images: ["/ghost-icon.svg"],
   },
 };
 
