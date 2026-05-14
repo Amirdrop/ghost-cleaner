@@ -8,20 +8,15 @@ export default function MiniAppProvider({
   children: React.ReactNode;
 }) {
   useEffect(() => {
-    const initMiniApp = async () => {
+    async function ready() {
       try {
-        const mod = await import("@farcaster/miniapp-sdk");
-        const sdk = (mod as any).default;
-        if (sdk && typeof sdk.ready === "function") {
-          await sdk.ready();
-          console.log("Mini App ready!");
-        }
-      } catch (err) {
-        console.log("Not in Farcaster Mini App context:", err);
+        const { sdk } = await import("@farcaster/miniapp-sdk");
+        await sdk.actions.ready();
+      } catch (e) {
+        console.log("ready() failed:", e);
       }
-    };
-
-    initMiniApp();
+    }
+    ready();
   }, []);
 
   return <>{children}</>;
