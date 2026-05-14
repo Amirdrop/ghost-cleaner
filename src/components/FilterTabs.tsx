@@ -15,21 +15,17 @@ const filters: { value: InactivityFilter; label: string }[] = [
   { value: 365, label: "1y" },
 ];
 
-export default function FilterTabs({
-  activeFilter,
-  onFilterChange,
-  counts,
-}: FilterTabsProps) {
+export default function FilterTabs({ activeFilter, onFilterChange, counts }: FilterTabsProps) {
   return (
-    <div className="flex items-center gap-1 p-1 bg-zinc-900/50 border border-zinc-800/50 rounded-xl w-fit">
+    <div className="flex items-center gap-1 p-1 bg-[#0d0d12] border border-[#232330] rounded-xl w-fit">
       {filters.map((filter) => (
         <button
           key={filter.value}
           onClick={() => onFilterChange(filter.value)}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
             activeFilter === filter.value
-              ? "bg-purple-600 text-white shadow-sm"
-              : "text-zinc-500 hover:text-white hover:bg-zinc-800/50"
+              ? "bg-[#8A63D2] text-white shadow-sm"
+              : "text-[#5C5C72] hover:text-white hover:bg-[#17171f]"
           }`}
         >
           <span>{filter.label}</span>
@@ -37,7 +33,7 @@ export default function FilterTabs({
             className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-md text-[10px] font-bold ${
               activeFilter === filter.value
                 ? "bg-white/20 text-white"
-                : "bg-zinc-800 text-zinc-500"
+                : "bg-[#17171f] text-[#5C5C72]"
             }`}
           >
             {counts[filter.value] || 0}
