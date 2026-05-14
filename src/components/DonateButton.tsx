@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const CHAINS = [
   { id: "base", name: "Base", symbol: "ETH", icon: "🔵" },
   { id: "ethereum", name: "Ethereum", symbol: "ETH", icon: "⟠" },
-  { id: "solana", name: "Solana", symbol: "SOL", icon: "◎" },
   { id: "bsc", name: "BNB Chain", symbol: "BNB", icon: "◆" },
 ];
 
@@ -20,16 +19,14 @@ const TOKENS: Record<string, { symbol: string; name: string }[]> = {
     { symbol: "USDC", name: "USD Coin" },
     { symbol: "USDT", name: "Tether" },
   ],
-  solana: [
-    { symbol: "SOL", name: "Solana" },
-    { symbol: "USDC", name: "USD Coin" },
-  ],
   bsc: [
     { symbol: "BNB", name: "BNB" },
     { symbol: "USDT", name: "Tether" },
     { symbol: "USDC", name: "USD Coin" },
   ],
 };
+
+const DONATE_ADDRESS = "0x065836dA2db1B48E526F91aAd599a9647d11058f";
 
 export default function DonateButton() {
   const [open, setOpen] = useState(false);
@@ -39,44 +36,61 @@ export default function DonateButton() {
   const [status, setStatus] = useState<"idle" | "connecting" | "sending" | "done" | "error">("idle");
   const [txHash, setTxHash] = useState("");
   const [walletAddress, setWalletAddress] = useState("");
+  const [provider, setProvider] = useState<any>(null);
+
+  // Try to get Farcaster wallet provider
+  useEffect(() => {
+    const getProvider = async () => {
+      try {
+        const { sdk } = await import("@farcaster/miniapp-sdk");
+        const ethProvider = await sdk.wallet.getEthereumProvider();
+        if (ethProvider) {
+          setProvider(ethProvider);
+          // Auto-connect if in Mini App
+          try {
+            const accounts = await ethProvider.request({ method: "eth_accounts" });
+            if (accounts && accounts.length > 0) {
+              setWalletAddress(accounts[0]);
+            }
+          } catch {}
+        }
+      } catch {
+        // Not in Mini App, try MetaMask
+        if (typeof window !== "undefined" && (window as any).ethereum) {
+          setProvider((window as any).ethereum);
+        }
+      }
+    };
+    getProvider();
+  }, []);
 
   const connectWallet = async () => {
     setStatus("connecting");
     try {
-      if (typeof window !== "undefined" && (window as any).ethereum) {
-        const accounts = await (window as any).ethereum.request({
-          method: "eth_requestAccounts",
-        });
-        setWalletAddress(accounts[0]);
-        setStatus("idle");
-      } else {
-        setStatus("error");
-        alert("No wallet detected. Please install MetaMask or another Web3 wallet.");
+      if (!provider) {
+        throw new Error("No wallet detected. Open this in Farcaster or install MetaMask.");
       }
-    } catch {
+      const accounts = await provider.request({ method: "eth_requestAccounts" });
+      setWalletAddress(accounts[0]);
       setStatus("idle");
+    } catch (err: any) {
+      setStatus("error");
+      alert(err.message || "Failed to connect wallet");
+      setTimeout(() => setStatus("idle"), 2000);
     }
   };
 
   const sendDonation = async () => {
-    if (!walletAddress || !amount || parseFloat(amount) < 0) return;
+    if (!walletAddress || !amount || parseFloat(amount) <= 0) return;
     setStatus("sending");
     try {
-      if (chain === "solana") {
-        setStatus("error");
-        alert("Solana donations coming soon! Use Base, Ethereum, or BNB for now.");
-        return;
-      }
-
-      const provider = (window as any).ethereum;
       const value = "0x" + (parseFloat(amount) * 1e18).toString(16);
-
       const tx = await provider.request({
         method: "eth_sendTransaction",
         params: [
           {
             from: walletAddress,
-            to: "0x065836dA2db1B48E526F91aAd599a9647d11058f",
+            to: DONATE_ADDRESS,
             value: value,
           },
         ],
@@ -109,13 +123,7 @@ export default function DonateButton() {
       {/* Modal */}
       {open && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setOpen(false)}
-          />
-
-          {/* Modal Content */}
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
           <div className="relative w-full max-w-md rounded-2xl border border-[#232330] bg-[#13131a] shadow-2xl animate-fadeIn overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between p-5 border-b border-[#232330]">
@@ -172,12 +180,6 @@ export default function DonateButton() {
                   <span className="text-xs text-[#9393A8] font-mono truncate">
                     {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
                   </span>
-                  <button
-                    onClick={() => { setWalletAddress(""); setToken("ETH"); setChain("base"); }}
-                    className="ml-auto text-[10px] text-[#5C5C72] hover:text-[#F87171] transition-colors"
-                  >
-                    Disconnect
-                  </button>
                 </div>
               )}
 
@@ -185,17 +187,12 @@ export default function DonateButton() {
               {walletAddress && (
                 <>
                   <div>
-                    <label className="text-[11px] text-[#5C5C72] font-semibold uppercase tracking-wider mb-2 block">
-                      Chain
-                    </label>
-                    <div className="grid grid-cols-4 gap-1.5">
+                    <label className="text-[11px] text-[#5C5C72] font-semibold uppercase tracking-wider mb-2 block">Chain</label>
+                    <div className="grid grid-cols-3 gap-1.5">
                       {CHAINS.map((c) => (
                         <button
                           key={c.id}
-                          onClick={() => {
-                            setChain(c.id);
-                            setToken(TOKENS[c.id][0].symbol);
-                          }}
+                          onClick={() => { setChain(c.id); setToken(TOKENS[c.id][0].symbol); }}
                           className={`py-2 rounded-lg text-xs font-semibold transition-all ${
                             chain === c.id
                               ? "bg-[#8A63D2]/15 text-[#A78BFA] border border-[#8A63D2]/30"
@@ -208,11 +205,8 @@ export default function DonateButton() {
                     </div>
                   </div>
 
-                  {/* Token Select */}
                   <div>
-                    <label className="text-[11px] text-[#5C5C72] font-semibold uppercase tracking-wider mb-2 block">
-                      Token
-                    </label>
+                    <label className="text-[11px] text-[#5C5C72] font-semibold uppercase tracking-wider mb-2 block">Token</label>
                     <div className="flex gap-1.5">
                       {TOKENS[chain]?.map((t) => (
                         <button
@@ -230,11 +224,8 @@ export default function DonateButton() {
                     </div>
                   </div>
 
-                  {/* Amount */}
                   <div>
-                    <label className="text-[11px] text-[#5C5C72] font-semibold uppercase tracking-wider mb-2 block">
-                      Amount ({token})
-                    </label>
+                    <label className="text-[11px] text-[#5C5C72] font-semibold uppercase tracking-wider mb-2 block">Amount ({token})</label>
                     <input
                       type="number"
                       min="0"
@@ -247,7 +238,6 @@ export default function DonateButton() {
                     />
                   </div>
 
-                  {/* Send */}
                   {status === "done" ? (
                     <div className="p-4 rounded-xl bg-[#34D399]/[0.06] border border-[#34D399]/20 text-center">
                       <div className="text-[#34D399] font-bold text-sm mb-1">Thank you! 💜</div>
@@ -293,9 +283,7 @@ export default function DonateButton() {
 
             {/* Footer */}
             <div className="px-5 py-3 border-t border-[#232330] bg-[#0d0d12]/50">
-              <p className="text-[10px] text-[#5C5C72] text-center">
-                0x065836dA2db1B48E526F91aAd599a9647d11058f
-              </p>
+              <p className="text-[10px] text-[#5C5C72] text-center font-mono">{DONATE_ADDRESS}</p>
             </div>
           </div>
         </div>

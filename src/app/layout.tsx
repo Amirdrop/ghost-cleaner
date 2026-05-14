@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import DonateButton from "@/components/DonateButton";
 import CreatorBadge from "@/components/CreatorBadge";
-import MiniAppProvider from "@/components/MiniAppProvider";
 
 export const metadata: Metadata = {
   title: "Ghost Cleaner — Farcaster Following Manager",
@@ -19,23 +18,6 @@ export const metadata: Metadata = {
     description: "Find and unfollow inactive Farcaster accounts",
     type: "website",
     images: ["/ghost-icon.svg"],
-  },
-  other: {
-    // Farcaster Mini App embed meta tags
-    "fc:miniapp": JSON.stringify({
-      version: "1",
-      imageUrl: "https://ghost-cleaner-inky.vercel.app/ghost-icon.svg",
-      button: {
-        title: "👻 Clean Ghosts",
-        action: {
-          type: "launch_miniapp",
-          name: "Ghost Cleaner",
-          url: "https://ghost-cleaner-inky.vercel.app",
-          splashImageUrl: "https://ghost-cleaner-inky.vercel.app/ghost-icon.svg",
-          splashBackgroundColor: "#0d0d12",
-        },
-      },
-    }),
   },
 };
 
@@ -62,8 +44,7 @@ export default function RootLayout({
                 type: "launch_miniapp",
                 name: "Ghost Cleaner",
                 url: "https://ghost-cleaner-inky.vercel.app",
-                splashImageUrl:
-                  "https://ghost-cleaner-inky.vercel.app/ghost-icon.svg",
+                splashImageUrl: "https://ghost-cleaner-inky.vercel.app/ghost-icon.svg",
                 splashBackgroundColor: "#0d0d12",
               },
             },
@@ -74,17 +55,30 @@ export default function RootLayout({
         className="bg-[#0d0d12] text-[#E8E8ED] min-h-screen antialiased"
         style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
       >
-        <MiniAppProvider>
-          <div className="relative min-h-screen">
-            <div className="fixed inset-0 -z-10 overflow-hidden">
-              <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-[#8A63D2]/[0.04] rounded-full blur-[100px]" />
-              <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-[#5B8DEF]/[0.04] rounded-full blur-[100px]" />
-            </div>
-            {children}
-            <CreatorBadge />
-            <DonateButton />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (async () => {
+                try {
+                  const { sdk } = await import('https://esm.sh/@farcaster/miniapp-sdk');
+                  await sdk.actions.ready();
+                  console.log('Mini App ready!');
+                } catch (e) {
+                  console.log('ready() error:', e);
+                }
+              })();
+            `,
+          }}
+        />
+        <div className="relative min-h-screen">
+          <div className="fixed inset-0 -z-10 overflow-hidden">
+            <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-[#8A63D2]/[0.04] rounded-full blur-[100px]" />
+            <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-[#5B8DEF]/[0.04] rounded-full blur-[100px]" />
           </div>
-        </MiniAppProvider>
+          {children}
+          <CreatorBadge />
+          <DonateButton />
+        </div>
       </body>
     </html>
   );
