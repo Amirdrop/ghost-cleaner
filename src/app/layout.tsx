@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import DonateButton from "@/components/DonateButton";
 import CreatorBadge from "@/components/CreatorBadge";
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Ghost Cleaner — Farcaster Following Manager",
@@ -41,8 +35,8 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${inter.className} bg-[#0d0d12] text-[#E8E8ED] min-h-screen antialiased`}
-        style={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}
+        className="bg-[#0d0d12] text-[#E8E8ED] min-h-screen antialiased"
+        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
       >
         <div className="relative min-h-screen">
           <div className="fixed inset-0 -z-10 overflow-hidden">
