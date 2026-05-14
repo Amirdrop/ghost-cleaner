@@ -5,7 +5,7 @@ export default function DonateButton() {
 
   const copyAddress = () => {
     navigator.clipboard.writeText(walletAddress);
-    alert("Address copied! 📋");
+    alert("Address copied!");
   };
 
   return (
@@ -13,16 +13,16 @@ export default function DonateButton() {
       <div className="group relative">
         <button
           onClick={copyAddress}
-          className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+          className="flex items-center gap-2 px-4 py-2.5 bg-zinc-900 border border-zinc-800 hover:border-purple-500/30 text-zinc-300 hover:text-white rounded-xl shadow-lg transition-all duration-200"
         >
-          <span className="text-lg">☕</span>
-          <span className="font-semibold text-sm">Buy me a coffee</span>
+          <span className="text-sm">☕</span>
+          <span className="font-medium text-xs">Donate</span>
         </button>
 
-        <div className="absolute bottom-full right-0 mb-2 w-72 p-3 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-          <p className="font-medium mb-1">Support Ghost Cleaner 👻</p>
-          <p className="text-gray-300 break-all font-mono">{walletAddress}</p>
-          <p className="text-gray-400 mt-1">Click to copy address</p>
+        <div className="absolute bottom-full right-0 mb-2 w-64 p-3 bg-zinc-900 border border-zinc-800 text-xs rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+          <p className="text-zinc-400 font-medium mb-1.5">Support Ghost Cleaner</p>
+          <p className="text-zinc-500 break-all font-mono text-[10px]">{walletAddress}</p>
+          <p className="text-zinc-600 mt-1.5">Click to copy address</p>
         </div>
       </div>
     </div>

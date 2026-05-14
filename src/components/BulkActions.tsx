@@ -18,41 +18,56 @@ export default function BulkActions({
   isUnfollowing,
 }: BulkActionsProps) {
   return (
-    <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-200 shadow-sm">
-      <div className="flex items-center gap-4">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl border border-zinc-800/50 bg-zinc-900/30">
+      <div className="flex items-center gap-3">
         <button
           onClick={onSelectAll}
-          className="px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors"
+          className="px-3 py-1.5 text-xs font-medium text-purple-400 bg-purple-500/10 border border-purple-500/20 rounded-lg hover:bg-purple-500/20 transition-colors"
         >
-          ✅ Pilih Semua
+          Select All
         </button>
         <button
           onClick={onDeselectAll}
-          className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+          className="px-3 py-1.5 text-xs font-medium text-zinc-400 bg-zinc-800/50 border border-zinc-700/30 rounded-lg hover:bg-zinc-800 transition-colors"
         >
-          ❌ Batal Pilih
+          Deselect
         </button>
-        <span className="text-sm text-gray-500">
-          {selectedCount} dari {totalCount} dipilih
+        <span className="text-xs text-zinc-500">
+          {selectedCount > 0 ? (
+            <>
+              <span className="text-white font-medium">{selectedCount}</span>{" "}
+              of {totalCount} selected
+            </>
+          ) : (
+            `${totalCount} accounts`
+          )}
         </span>
       </div>
 
       <button
         onClick={onUnfollow}
         disabled={selectedCount === 0 || isUnfollowing}
-        className={`px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 ${
+        className={`px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
           selectedCount > 0 && !isUnfollowing
-            ? "bg-red-500 text-white hover:bg-red-600 shadow-lg shadow-red-200"
-            : "bg-gray-100 text-gray-400 cursor-not-allowed"
+            ? "bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20"
+            : "bg-zinc-800/30 text-zinc-600 border border-zinc-800/30 cursor-not-allowed"
         }`}
       >
         {isUnfollowing ? (
-          <span className="flex items-center gap-2">
-            <span className="animate-spin">⏳</span>
+          <>
+            <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
             Unfollowing...
-          </span>
+          </>
         ) : (
-          `🗑️ Unfollow (${selectedCount})`
+          <>
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Unfollow ({selectedCount})
+          </>
         )}
       </button>
     </div>

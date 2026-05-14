@@ -19,17 +19,17 @@ export function filterByInactivity(
 }
 
 export function getInactivityLabel(days: number): string {
-  if (days >= 365) return "1+ tahun tidak aktif";
-  if (days >= 90) return "3+ bulan tidak aktif";
-  if (days >= 60) return "2+ bulan tidak aktif";
-  if (days >= 30) return "1+ bulan tidak aktif";
-  return "Aktif";
+  if (days >= 365) return "1y+ inactive";
+  if (days >= 90) return "3m+ inactive";
+  if (days >= 60) return "2m+ inactive";
+  if (days >= 30) return "1m+ inactive";
+  return "Active";
 }
 
 export function getInactivityColor(days: number): string {
-  if (days >= 365) return "text-red-600 bg-red-50";
-  if (days >= 90) return "text-orange-600 bg-orange-50";
-  if (days >= 60) return "text-yellow-600 bg-yellow-50";
-  if (days >= 30) return "text-blue-600 bg-blue-50";
-  return "text-green-600 bg-green-50";
+  if (days >= 365) return "text-red-400 bg-red-500/10 border border-red-500/20";
+  if (days >= 90) return "text-orange-400 bg-orange-500/10 border border-orange-500/20";
+  if (days >= 60) return "text-yellow-400 bg-yellow-500/10 border border-yellow-500/20";
+  if (days >= 30) return "text-blue-400 bg-blue-500/10 border border-blue-500/20";
+  return "text-emerald-400 bg-emerald-500/10 border border-emerald-500/20";
 }
