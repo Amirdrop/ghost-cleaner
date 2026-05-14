@@ -204,7 +204,7 @@ export default function ScanPage() {
           {/* Input Field */}
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium pointer-events-none">
                 {inputMode === "username" ? "@" : "#"}
               </span>
               <input
@@ -220,8 +220,8 @@ export default function ScanPage() {
                     ? "Masukkan username (contoh: dwr)"
                     : "Masukkan FID (contoh: 1234)"
                 }
-                className="w-full pl-10 pr-4 py-3.5 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none transition-all text-gray-900 text-base font-medium placeholder:text-gray-400 bg-white"
-                style={{ color: "#1a1a2e" }}
+                className="w-full pl-10 pr-4 py-3.5 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 outline-none transition-all text-base font-semibold bg-white"
+                style={{ color: "#111827", WebkitTextFillColor: "#111827", caretColor: "#111827" }}
               />
             </div>
             <button

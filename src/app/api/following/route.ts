@@ -3,6 +3,20 @@ import { getFollowing, getUserCasts } from "@/lib/farcaster";
 import { calculateInactiveDays } from "@/lib/scoring";
 import { FarcasterUser } from "@/types/user";
 
+// Rate limiter: max 9 requests per 10 seconds for Warpcast API
+const RATE_LIMIT_INTERVAL = 1100; // 1.1 seconds between requests
+let lastRequestTime = 0;
+
+async function rateLimitedGetCasts(fid: number) {
+  const now = Date.now();
+  const elapsed = now - lastRequestTime;
+  if (elapsed < RATE_LIMIT_INTERVAL) {
+    await new Promise((r) => setTimeout(r, RATE_LIMIT_INTERVAL - elapsed));
+  }
+  lastRequestTime = Date.now();
+  return getUserCasts(fid, 1);
+}
+
 export async function GET(req: NextRequest) {
   const fid = req.nextUrl.searchParams.get("fid");
 
@@ -16,7 +30,7 @@ export async function GET(req: NextRequest) {
     let hasMore = true;
 
     while (hasMore) {
-      const data = await getFollowing(parseInt(fid), 100, cursor);
+      const data = await getFollowing(parseInt(fid), 50, cursor);
 
       if (!data.users || data.users.length === 0) break;
 
@@ -24,7 +38,7 @@ export async function GET(req: NextRequest) {
         let lastActiveDate: string | null = null;
 
         try {
-          const casts = await getUserCasts(user.fid, 1);
+          const casts = await rateLimitedGetCasts(user.fid);
           if (casts.casts && casts.casts.length > 0) {
             lastActiveDate = casts.casts[0].timestamp;
           }
@@ -48,7 +62,7 @@ export async function GET(req: NextRequest) {
       }
 
       cursor = data.next?.cursor;
-      hasMore = !!cursor && data.users.length === 100;
+      hasMore = !!cursor && data.users.length === 50;
     }
 
     return NextResponse.json({
