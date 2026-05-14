@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import DonateButton from "@/components/DonateButton";
 import CreatorBadge from "@/components/CreatorBadge";
 
-const jakarta = Plus_Jakarta_Sans({
+const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-jakarta",
-  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -16,10 +14,16 @@ export const metadata: Metadata = {
   description:
     "Detect and unfollow inactive Farcaster accounts. Keep your following list clean.",
   keywords: ["farcaster", "ghost", "unfollow", "cleaner", "web3"],
+  icons: {
+    icon: "/ghost-icon.svg",
+    shortcut: "/ghost-icon.svg",
+    apple: "/ghost-icon.svg",
+  },
   openGraph: {
     title: "Ghost Cleaner",
     description: "Find and unfollow inactive Farcaster accounts",
     type: "website",
+    images: ["/ghost-icon.svg"],
   },
 };
 
@@ -30,8 +34,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
-        className={`${jakarta.className} bg-[#0d0d12] text-[#E8E8ED] min-h-screen antialiased`}
+        className={`${inter.className} bg-[#0d0d12] text-[#E8E8ED] min-h-screen antialiased`}
+        style={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}
       >
         <div className="relative min-h-screen">
           <div className="fixed inset-0 -z-10 overflow-hidden">
