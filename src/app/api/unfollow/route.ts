@@ -1,50 +1,73 @@
 import { NextRequest, NextResponse } from "next/server";
-import { unfollowUser } from "@/lib/farcaster";
+import {
+  NobleEd25519Signer,
+  FarcasterNetwork,
+  getSSLHubRpcClient,
+  makeLinkRemove,
+} from "@farcaster/hub-nodejs";
+
+const HUB_URL = "hub.pinata.cloud:2283";
 
 export async function POST(req: NextRequest) {
-  const { signerUuid, targetFids } = await req.json();
-
-  if (!signerUuid || !targetFids || !Array.isArray(targetFids)) {
-    return NextResponse.json(
-      { error: "signerUuid and targetFids array are required" },
-      { status: 400 }
-    );
-  }
-
   try {
-    const results = await Promise.allSettled(
-      targetFids.map(async (targetFid: number) => {
-        try {
-          await unfollowUser(signerUuid, targetFid);
-          return { fid: targetFid, success: true };
-        } catch (error) {
-          return {
-            fid: targetFid,
-            success: false,
-            error: error instanceof Error ? error.message : "Unknown error",
-          };
+    const { fid, targetFids, privateKey } = await req.json();
+
+    if (!fid || !targetFids || !Array.isArray(targetFids) || !privateKey) {
+      return NextResponse.json(
+        { error: "fid, privateKey, and targetFids array required" },
+        { status: 400 }
+      );
+    }
+
+    // Create signer from private key (sent from browser)
+    const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, "hex"));
+    const signer = new NobleEd25519Signer(privateKeyBytes);
+
+    const client = getSSLHubRpcClient(HUB_URL);
+    const results = { success: 0, failed: 0, errors: [] as string[] };
+
+    for (const targetFid of targetFids) {
+      try {
+        // Create link remove message (unfollow)
+        const linkRemoveResult = await makeLinkRemove(
+          { type: "follow", targetFid },
+          { fid, network: FarcasterNetwork.MAINNET },
+          signer
+        );
+
+        if (linkRemoveResult.isErr()) {
+          results.failed++;
+          results.errors.push(`FID ${targetFid}: ${linkRemoveResult.error}`);
+          continue;
         }
-      })
-    );
 
-    const unfollowResults = results.map((result) =>
-      result.status === "fulfilled"
-        ? result.value
-        : { fid: 0, success: false, error: "Request failed" }
-    );
+        // Submit to Hub
+        const submitResult = await client.submitMessage(linkRemoveResult.value);
 
-    const successCount = unfollowResults.filter((r) => r.success).length;
+        if (submitResult.isErr()) {
+          results.failed++;
+          results.errors.push(`FID ${targetFid}: Hub rejected - ${submitResult.error}`);
+          continue;
+        }
+
+        results.success++;
+      } catch (err: any) {
+        results.failed++;
+        results.errors.push(`FID ${targetFid}: ${err.message}`);
+      }
+    }
+
+    client.close();
 
     return NextResponse.json({
-      results: unfollowResults,
-      total: targetFids.length,
-      success: successCount,
-      failed: targetFids.length - successCount,
+      success: results.success,
+      failed: results.failed,
+      errors: results.errors,
     });
-  } catch (error) {
-    console.error("Error unfollowing:", error);
+  } catch (error: any) {
+    console.error("Unfollow error:", error);
     return NextResponse.json(
-      { error: "Failed to unfollow" },
+      { error: `Unfollow failed: ${error.message}` },
       { status: 500 }
     );
   }
